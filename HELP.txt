@@ -1,0 +1,3 @@
+hw01 dependency install:
+mvn install:install-file -Dfile=C:\Users\Alex\oprpp2\hw01-0036537370\src\main\resources\fractal-viewer-1.1.jar 
+-DgroupId="hr.fer.zemris.java.fractals" -DartifactId=fractal-viewer -Dversion="1.1" -Dpackaging=jar -DgeneratePom=true
