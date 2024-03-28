@@ -8,6 +8,8 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class NetworkUtil {
 
@@ -70,6 +72,31 @@ public class NetworkUtil {
             return new AckMessage(dis.readLong(), dis.readLong());
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public static void sendMessageByAckListCheck(InetAddress ip, int port, DatagramSocket socket,
+                                                       Message message, BlockingQueue<AckMessage> ackMessages) {
+        for (int i = 0; i < 10; i++) {
+            try {
+                System.out.println("Trying to send a message with number " + message.getNumber() + ".");
+                NetworkUtil.sendMessage(ip, port, socket, message);
+            } catch (Exception e) {
+                continue;
+            }
+
+            AckMessage ackMessage;
+
+            try {
+                ackMessage = ackMessages.poll(5000, TimeUnit.MILLISECONDS);
+            } catch (Exception e) {
+                continue;
+            }
+
+            if (ackMessage != null && ackMessage.getNumber() == message.getNumber()) {
+                System.out.println("Got ack message with number " + ackMessage.getNumber() + ".");
+                break;
+            }
         }
     }
 

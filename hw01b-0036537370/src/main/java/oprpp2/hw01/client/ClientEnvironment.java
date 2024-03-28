@@ -68,28 +68,7 @@ public class ClientEnvironment extends JFrame {
         new Thread(() -> {
             OutMessage message = new OutMessage(this.count++, this.uid, text);
 
-            for (int i = 0; i < 10; i++) {
-                try {
-                    System.out.println("Trying to send an out text message: \"" + text
-                            + "\" with number " + message.getNumber() + ".");
-                    NetworkUtil.sendMessage(this.ip, this.port, this.socket, message);
-                } catch (Exception e) {
-                    continue;
-                }
-
-                AckMessage ackMessage;
-
-                try {
-                    ackMessage = this.ackMessages.poll(5000, TimeUnit.MILLISECONDS);
-                } catch (Exception e) {
-                    continue;
-                }
-
-                if (ackMessage != null && ackMessage.getNumber() == message.getNumber()) {
-                    System.out.println("Got ack message with number " + ackMessage.getNumber() + ".");
-                    break;
-                }
-            }
+            NetworkUtil.sendMessageByAckListCheck(this.ip, this.port, this.socket, message, this.ackMessages);
 
             enableInput();
         }).start();
@@ -101,27 +80,7 @@ public class ClientEnvironment extends JFrame {
         new Thread(() -> {
             ByeMessage message = new ByeMessage(this.count++, this.uid);
 
-            for (int i = 0; i < 10; i++) {
-                try {
-                    System.out.println("Trying to send a bye message with number " + message.getNumber() + ".");
-                    NetworkUtil.sendMessage(this.ip, this.port, this.socket, message);
-                } catch (Exception e) {
-                    continue;
-                }
-
-                AckMessage ackMessage;
-
-                try {
-                    ackMessage = this.ackMessages.poll(5000, TimeUnit.MILLISECONDS);
-                } catch (Exception e) {
-                    continue;
-                }
-
-                if (ackMessage != null && ackMessage.getNumber() == message.getNumber()) {
-                    System.out.println("Got ack message with number " + ackMessage.getNumber() + ".");
-                    break;
-                }
-            }
+            NetworkUtil.sendMessageByAckListCheck(this.ip, this.port, this.socket, message, this.ackMessages);
         }).start();
 
         this.worker.cancel(true);
