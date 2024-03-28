@@ -25,16 +25,6 @@ public class NetworkUtil {
         socket.send(packet);
     }
 
-    public static void sendMessageByAddress(SocketAddress address, DatagramSocket socket, Message message)
-            throws IOException {
-        byte[] data = message.getBytes();
-        DatagramPacket packet = new DatagramPacket(data, data.length);
-
-        packet.setSocketAddress(address);
-
-        socket.send(packet);
-    }
-
     public static void sendAnswer(DatagramSocket socket, DatagramPacket inPacket, Message message) throws IOException {
         byte[] data = message.getBytes();
         DatagramPacket packet = new DatagramPacket(data, data.length);
@@ -56,8 +46,6 @@ public class NetworkUtil {
             } catch (IOException e) {
                 return null;
             }
-
-            System.out.println("Trying to receive answer.");
 
             try {
                 socket.setSoTimeout(NetworkUtil.TIMEOUT_DURATION);

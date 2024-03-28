@@ -45,24 +45,13 @@ public class Main {
             return;
         }
 
-        ClientEnvironment environment;
-        ClientWorker worker = new ClientWorker(ip, port, socket);
-
         try {
-            environment = new ClientEnvironment(ip, port, socket, fullName, worker);
-            worker.setEnvironment(environment);
+            ClientEnvironment environment = new ClientEnvironment(ip, port, socket, fullName);
+            SwingUtilities.invokeLater(() -> environment.setVisible(true));
         } catch (ClientException e) {
             System.out.println(e.getMessage());
             System.exit(0);
-            return;
         }
-
-        SwingUtilities.invokeLater(() -> {
-            ClientFrame frame = new ClientFrame(environment, name, worker);
-            environment.setFrame(frame);
-            worker.setFrame(frame);
-            frame.setVisible(true);
-        });
     }
 
 }

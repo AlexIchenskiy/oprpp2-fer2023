@@ -4,6 +4,7 @@ import oprpp2.hw01.message.*;
 import oprpp2.hw01.util.MessageUtil;
 import oprpp2.hw01.util.NetworkUtil;
 
+import javax.swing.*;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -11,83 +12,44 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.concurrent.BlockingQueue;
 
-public class ClientWorker {
+public class ClientWorker extends SwingWorker<Void, Void> {
 
     private final InetAddress ip;
     private final int port;
     private final DatagramSocket socket;
+    private final long uid;
+    private final BlockingQueue<AckMessage> ackMessages;
+    private final ClientEnvironment environment;
 
-    private ClientEnvironment environment;
-    private Long uid = null;
-    private Message pendingMessage = null;
+    private long count = 0;
 
-    private ClientFrame frame = null;
-
-    public ClientWorker(InetAddress ip, int port, DatagramSocket socket) {
+    public ClientWorker(InetAddress ip, int port, DatagramSocket socket, long uid,
+                        BlockingQueue<AckMessage> ackMessages, ClientEnvironment environment) {
+        super();
         this.ip = ip;
         this.port = port;
         this.socket = socket;
-    }
-
-    public void setFrame(ClientFrame frame) {
-        this.frame = frame;
-    }
-
-    public void setEnvironment(ClientEnvironment environment) {
+        this.uid = uid;
+        this.ackMessages = ackMessages;
         this.environment = environment;
     }
 
-    public void setPendingMessage(Message pendingMessage) {
-        this.pendingMessage = pendingMessage;
-    }
-
-    public void listen() {
+    /**
+     * Computes a result, or throws an exception if unable to do so.
+     *
+     * <p>
+     * Note that this method is executed only once.
+     *
+     * <p>
+     * Note: this method is executed in a background thread.
+     *
+     * @return the computed result
+     */
+    @Override
+    protected Void doInBackground() {
         while (true) {
-            if (pendingMessage != null) {
-                System.out.println("Input disabling");
-
-                if (pendingMessage instanceof HelloMessage) {
-                    AckMessage response = NetworkUtil.getResponseBySendMessage(this.ip,
-                            this.port, this.socket, pendingMessage);
-
-                    if (response == null) {
-                        throw new ClientException("Could not establish connection with a server.");
-                    }
-
-                    pendingMessage = null;
-                    this.uid = response.getKey();
-                    this.environment.setUid(this.uid);
-                    this.pendingMessage = null;
-
-                    System.out.println("Enabling ");
-                    if (this.frame != null) this.frame.enableInput();
-                    continue;
-                } else if (pendingMessage instanceof ByeMessage) {
-                    AckMessage response = NetworkUtil.getResponseBySendMessage(this.ip,
-                            this.port, this.socket, pendingMessage);
-
-                    if (response == null) {
-                        throw new ClientException("Could not establish connection with a server.");
-                    }
-
-                    this.frame.dispose();
-                    return;
-                } else {
-                    AckMessage response = NetworkUtil.getResponseBySendMessage(this.ip,
-                            this.port, this.socket, pendingMessage);
-
-                    if (response == null) {
-                        throw new ClientException("Could not establish connection with a server.");
-                    }
-
-                    this.pendingMessage = null;
-
-                    if (this.frame != null) this.frame.enableInput();
-                    continue;
-                }
-            }
-
             byte[] receiveBuffer = new byte[NetworkUtil.MAX_MESSAGE_LENGTH];
             DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
 
@@ -97,25 +59,59 @@ public class ClientWorker {
                 continue;
             }
 
-            try {
-                Message message = MessageUtil.getMessageFromByte(receivePacket.getData());
+            byte[] receiveBufferCopy = Arrays.copyOf(receiveBuffer, receiveBuffer.length);
 
-                if (!(message instanceof InMessage)) continue;
+            try (ByteArrayInputStream bis = new ByteArrayInputStream(receiveBufferCopy);
+                 DataInputStream dis = new DataInputStream(bis)) {
+                byte type = dis.readByte();
 
-                InMessage inMessage = (InMessage) message;
-
-                if (this.uid != null) {
-                    NetworkUtil.sendMessage(this.ip, this.port, this.socket,
-                            new AckMessage(message.getNumber(), uid));
+                switch (type) {
+                    case 2:
+                        this.handleAck(receivePacket);
+                        break;
+                    case 5:
+                        this.handleIn(receivePacket);
+                        break;
                 }
-
-                if (this.frame != null) {
-                    this.frame.handleReceiveMessage(receivePacket.getSocketAddress().toString(),
-                            inMessage.getFullName(), inMessage.getMessage());
-                }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 continue;
             }
+        }
+    }
+
+    private void handleAck(DatagramPacket inPacket) {
+        AckMessage message = (AckMessage) MessageUtil.getMessageFromByte(inPacket.getData());
+
+        if (message == null) return;
+
+        System.out.println("Received an ack message with number " + message.getNumber() + ".");
+
+        while (true) {
+            try {
+                this.ackMessages.put(message);
+                break;
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    private void handleIn(DatagramPacket inPacket) {
+        InMessage message = (InMessage) MessageUtil.getMessageFromByte(inPacket.getData());
+
+        if (message == null) return;
+
+        System.out.println("Received an in message with number " + message.getNumber() + ".");
+
+        if (message.getNumber() > this.count) {
+            this.count = message.getNumber();
+
+            this.environment.handleNewMessage(message.getMessage(), message.getFullName(),
+                    inPacket.getSocketAddress().toString());
+        }
+
+        try {
+            NetworkUtil.sendMessage(this.ip, this.port, this.socket, new AckMessage(message.getNumber(), this.uid));
+        } catch (Exception ignored) {
         }
     }
 
