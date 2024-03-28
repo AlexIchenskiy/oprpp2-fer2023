@@ -18,7 +18,6 @@ public class Main {
             environment.listen();
         } catch (ServerException e) {
             System.out.println(e.getMessage());
-            e.printStackTrace();
             System.exit(0);
         }
     }

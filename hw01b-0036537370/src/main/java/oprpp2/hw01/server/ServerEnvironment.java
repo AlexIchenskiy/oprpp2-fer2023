@@ -23,8 +23,6 @@ public class ServerEnvironment {
 
     private final Map<Long, ServerClientData> userById = new HashMap<>();
 
-    private long count = 0;
-
     public ServerEnvironment(int port) {
         this.ip = (InetAddress) null;
         this.port = port;
@@ -34,9 +32,13 @@ public class ServerEnvironment {
         } catch (Exception e) {
             throw new ServerException("Could not initialize server.", e);
         }
+
+        System.out.println("Started server.");
     }
 
     public void listen() {
+        System.out.println("Started listening for messages.");
+
         while (true) {
             byte[] receiveBuffer = new byte[NetworkUtil.MAX_MESSAGE_LENGTH];
             DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
@@ -52,8 +54,6 @@ public class ServerEnvironment {
             try (ByteArrayInputStream bis = new ByteArrayInputStream(receiveBufferCopy);
                  DataInputStream dis = new DataInputStream(bis)) {
                 byte type = dis.readByte();
-
-                System.out.println(type);
 
                 switch (type) {
                     case 1:
@@ -82,10 +82,16 @@ public class ServerEnvironment {
             return;
         }
 
+        System.out.println("Got hello message with number " + message.getNumber()
+                + " from user on address " + inPacket.getSocketAddress() + " with key "
+                + message.getKey() + ".");
+
         if (uidByKey.get(message.getKey()) != null) {
             try {
                 NetworkUtil.sendMessage(this.ip, this.port, this.socket,
                         new AckMessage(message.getNumber(), uidByKey.get(message.getKey())));
+                System.out.println("User with key " + message.getKey() + " already exists, sending ack with number "
+                        + message.getNumber() + ".");
             } catch (Exception e) {
                 return;
             }
@@ -99,10 +105,13 @@ public class ServerEnvironment {
         userById.put(uid, new ServerClientData(uid, message.getFullName(), inPacket.getSocketAddress()));
 
         new Thread(new ServerWorker(userById.get(uid), this.socket)).start();
+        System.out.println("Created worker for user with key " + message.getKey() + " and a new uid " + uid + ".");
 
         try {
             NetworkUtil.sendAnswer(this.socket, inPacket,
                     new AckMessage(message.getNumber(), uidByKey.get(message.getKey())));
+            System.out.println("Sent ack message with number " + message.getNumber()
+                    + " to user with uid " + uid + ".");
         } catch (Exception e) {
             return;
         }
@@ -114,6 +123,16 @@ public class ServerEnvironment {
         if (message == null) {
             return;
         }
+
+        ServerClientData data = this.userById.get(message.getKey());
+
+        if (message.getNumber() > data.getCount()) {
+            data.setCount(message.getNumber());
+        }
+
+        System.out.println("Got ack message with number " + message.getNumber()
+                + " from user on address " + inPacket.getSocketAddress() + " with key "
+                + message.getKey() + ".");
 
         ServerClientData clientData = userById.get(message.getKey());
 
@@ -133,11 +152,17 @@ public class ServerEnvironment {
             return;
         }
 
+        System.out.println("Got bye message with number " + message.getNumber()
+                + " from user on address " + inPacket.getSocketAddress() + " with key "
+                + message.getKey() + ".");
+
         userById.remove(message.getKey());
 
         try {
             NetworkUtil.sendAnswer(this.socket, inPacket,
                     new AckMessage(message.getNumber(), message.getKey()));
+            System.out.println("Sent ack message with number " + message.getNumber()
+                    + " to user with uid " + message.getKey() + ".");
         } catch (Exception e) {
             return;
         }
@@ -150,26 +175,35 @@ public class ServerEnvironment {
             return;
         }
 
+        ServerClientData data = this.userById.get(message.getKey());
+
+        if (message.getNumber() > data.getCount()) {
+            return;
+        }
+
+        System.out.println("Got out message with number " + message.getNumber()
+                + " and text: \"" + message.getMessage() + "\" from user on address "
+                + inPacket.getSocketAddress() + " with key "
+                + message.getKey() + ".");
+
         this.userById.forEach((key, value) -> {
-            while (true) {
-                try {
-                    value.handleNewMessage(
-                            new InMessage(count,
-                                    this.userById.get(message.getKey()).getFullName(), message.getMessage()));
-                    break;
-                } catch (Exception ignored) {
-                }
+            try {
+                value.handleNewMessage(
+                        new InMessage(value.getCount(),
+                                this.userById.get(message.getKey()).getFullName(), message.getMessage()));
+                value.setCount(value.getCount() + 1);
+            } catch (Exception ignored) {
             }
         });
 
         try {
             NetworkUtil.sendAnswer(this.socket, inPacket,
-                    new AckMessage(message.getNumber(), uidByKey.get(message.getKey())));
+                    new AckMessage(message.getNumber(), message.getKey()));
+            System.out.println("Sent ack message with number " + message.getNumber()
+                    + " to user with uid " + message.getKey() + ".");
         } catch (Exception e) {
             return;
         }
-
-        this.count++;
     }
 
 }

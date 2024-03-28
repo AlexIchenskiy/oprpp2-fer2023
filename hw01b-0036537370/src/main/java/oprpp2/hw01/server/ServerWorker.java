@@ -37,7 +37,8 @@ public class ServerWorker implements Runnable {
 
             try {
                 message = this.clientData.getMessagesToSend().take();
-                System.out.println("Got: " + message);
+                System.out.println("Trying to send message with number " + message.getNumber()
+                        + " to user " + this.clientData.getAddress() + ".");
                 byte[] data = message.getBytes();
 
                 packet = new DatagramPacket(data, data.length);
@@ -47,10 +48,12 @@ public class ServerWorker implements Runnable {
 
             for (int i = 0; i < 10; i++) {
                 try {
-                    System.out.println("Sending message to " + this.clientData.getAddress());
+                    System.out.println("Sending message with number " + message.getNumber()
+                            + " to user " + this.clientData.getAddress() + ".");
                     packet.setSocketAddress(this.clientData.getAddress());
                     socket.send(packet);
-                    System.out.println("Sent message");
+                    System.out.println("Sent message with number " + message.getNumber()
+                            + " to user " + this.clientData.getAddress() + ".");
                 } catch (Exception e) {
                     continue;
                 }
@@ -63,7 +66,9 @@ public class ServerWorker implements Runnable {
                     continue;
                 }
 
-                if (ackMessage != null) break;
+                if (ackMessage != null && message.getNumber() == ackMessage.getNumber()) {
+                    break;
+                }
             }
         }
     }

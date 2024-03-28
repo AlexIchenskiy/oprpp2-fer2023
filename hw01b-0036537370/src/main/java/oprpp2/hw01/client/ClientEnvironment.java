@@ -27,6 +27,7 @@ public class ClientEnvironment extends JFrame {
 
     private JTextField textField;
     private JTextArea textArea;
+    private JScrollPane pane;
 
     private long count = 0;
 
@@ -128,6 +129,9 @@ public class ClientEnvironment extends JFrame {
 
     public void handleNewMessage(String message, String fullName, String address) {
         this.textArea.append("[" + address + "] Poruka od korisnika: " + fullName + "\n" + message + "\n\n");
+
+        JScrollBar bar = this.pane.getVerticalScrollBar();
+        if (bar != null) bar.setValue(bar.getMaximum());
     }
 
     public void enableInput() {
@@ -158,8 +162,10 @@ public class ClientEnvironment extends JFrame {
         this.textArea.setEditable(false);
         this.enableInput();
 
+        this.pane = new JScrollPane(textArea);
+
         this.add(textField, BorderLayout.NORTH);
-        this.add(new JScrollPane(textArea), BorderLayout.CENTER);
+        this.add(this.pane, BorderLayout.CENTER);
 
         this.addWindowListener(new WindowAdapter() {
 
