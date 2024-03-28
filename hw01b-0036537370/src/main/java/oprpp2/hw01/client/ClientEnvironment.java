@@ -132,6 +132,8 @@ public class ClientEnvironment extends JFrame {
 
         JScrollBar bar = this.pane.getVerticalScrollBar();
         if (bar != null) bar.setValue(bar.getMaximum());
+
+        this.textArea.setCaretPosition(this.textArea.getDocument().getLength());
     }
 
     public void enableInput() {
