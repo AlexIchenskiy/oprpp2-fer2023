@@ -4,21 +4,45 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+/**
+ * Class representing an out message.
+ */
 public class OutMessage extends Message {
 
-    private long key;
-    private String message;
+    /**
+     * A message key
+     */
+    private final long key;
 
+    /**
+     * A message text
+     */
+    private final String message;
+
+    /**
+     * Constructs a new out message.
+     * @param number Message number
+     * @param key Message key
+     * @param message Message text
+     */
     public OutMessage(long number, long key, String message) {
         super((byte) 4, number);
         this.key = key;
         this.message = message;
     }
 
+    /**
+     * Returns a message key.
+     * @return Message key
+     */
     public long getKey() {
         return key;
     }
 
+    /**
+     * Returns a message text.
+     * @return Message text
+     */
     public String getMessage() {
         return message;
     }

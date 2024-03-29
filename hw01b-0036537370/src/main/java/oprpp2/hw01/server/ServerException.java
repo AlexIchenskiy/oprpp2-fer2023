@@ -1,5 +1,9 @@
 package oprpp2.hw01.server;
 
+/**
+ * Class representing a server exception that is thrown only when server could not be initialized.
+ * It can be handled by application terminating.
+ */
 public class ServerException extends RuntimeException {
 
     /**

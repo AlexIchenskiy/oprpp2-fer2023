@@ -4,21 +4,45 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+/**
+ * Class representing an in message.
+ */
 public class InMessage extends Message {
 
-    private String fullName;
-    private String message;
+    /**
+     * User full name
+     */
+    private final String fullName;
 
+    /**
+     * A message text
+     */
+    private final String message;
+
+    /**
+     * Constructs a new in message.
+     * @param number Message number
+     * @param fullName User full name
+     * @param message Message text
+     */
     public InMessage(long number, String fullName, String message) {
         super((byte) 5, number);
         this.fullName = fullName;
         this.message = message;
     }
 
+    /**
+     * Returns a user full name.
+     * @return User full name
+     */
     public String getFullName() {
         return fullName;
     }
 
+    /**
+     * Returns a message text.
+     * @return Message text
+     */
     public String getMessage() {
         return message;
     }

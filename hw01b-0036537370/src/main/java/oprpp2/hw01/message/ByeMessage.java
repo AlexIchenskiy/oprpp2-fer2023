@@ -4,15 +4,30 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+/**
+ * Class representing a bye message.
+ */
 public class ByeMessage extends Message {
 
-    private long key;
+    /**
+     * A message key
+     */
+    private final long key;
 
+    /**
+     * Constructs a new bye message.
+     * @param number Message number
+     * @param key Message key (UID)
+     */
     public ByeMessage(long number, long key) {
         super((byte) 3, number);
         this.key = key;
     }
 
+    /**
+     * Returns a message key.
+     * @return Message key
+     */
     public long getKey() {
         return key;
     }

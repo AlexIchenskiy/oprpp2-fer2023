@@ -14,17 +14,55 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 
+/**
+ * Class representing a client background job for receiving messages from server.
+ */
 public class ClientWorker extends SwingWorker<Void, Void> {
 
+    /**
+     * Server ip
+     */
     private final InetAddress ip;
+
+    /**
+     * Server port
+     */
     private final int port;
+
+    /**
+     * Server socket
+     */
     private final DatagramSocket socket;
+
+    /**
+     * User ID
+     */
     private final long uid;
+
+    /**
+     * Received acknowledgment messages
+     */
     private final BlockingQueue<AckMessage> ackMessages;
+
+    /**
+     * Client environment
+     */
     private final ClientEnvironment environment;
 
+    /**
+     * Worker message count
+     */
     private long count = 0;
 
+    /**
+     * Creates a new client background listener job.
+     * @param ip Server ip
+     * @param port Server port
+     * @param socket Socket for connecting to the server
+     * @param uid Client UID
+     * @param ackMessages Acknowledgment messages received by client
+     * @param environment Client environment
+     */
     public ClientWorker(InetAddress ip, int port, DatagramSocket socket, long uid,
                         BlockingQueue<AckMessage> ackMessages, ClientEnvironment environment) {
         super();
@@ -79,6 +117,10 @@ public class ClientWorker extends SwingWorker<Void, Void> {
         }
     }
 
+    /**
+     * Function for handling a received acknowledgement message.
+     * @param inPacket Received acknowledgment message packet
+     */
     private void handleAck(DatagramPacket inPacket) {
         AckMessage message = (AckMessage) MessageUtil.getMessageFromByte(inPacket.getData());
 
@@ -95,6 +137,10 @@ public class ClientWorker extends SwingWorker<Void, Void> {
         }
     }
 
+    /**
+     * Function for handling a received in message.
+     * @param inPacket Received in message packet
+     */
     private void handleIn(DatagramPacket inPacket) {
         InMessage message = (InMessage) MessageUtil.getMessageFromByte(inPacket.getData());
 

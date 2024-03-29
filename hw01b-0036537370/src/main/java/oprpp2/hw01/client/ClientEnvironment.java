@@ -15,25 +15,74 @@ import java.net.InetAddress;
 import java.security.SecureRandom;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
+/**
+ * Client environment handling main client logic using GUI.
+ */
 public class ClientEnvironment extends JFrame {
 
+    /**
+     * Server ip
+     */
     private final InetAddress ip;
+
+    /**
+     * Server port
+     */
     private final int port;
+
+    /**
+     * Server socket
+     */
     private final DatagramSocket socket;
+
+    /**
+     * User full name
+     */
     private final String fullName;
+
+    /**
+     * User ID
+     */
     private final long uid;
 
+    /**
+     * GUI input text field
+     */
     private JTextField textField;
+
+    /**
+     * GUI output text are
+     */
     private JTextArea textArea;
+
+    /**
+     * GUI scroll pane
+     */
     private JScrollPane pane;
 
+    /**
+     * Client message count
+     */
     private long count = 0;
 
+    /**
+     * Received acknowledgment messages
+     */
     private final BlockingQueue<AckMessage> ackMessages = new LinkedBlockingQueue<>();
+
+    /**
+     * Client listening worker
+     */
     private final ClientWorker worker;
 
+    /**
+     * Constructs a new client environment by connecting to the server and retrieving a client UID.
+     * @param ip Server ip
+     * @param port Server port
+     * @param socket Socket for server connection
+     * @param fullName Client full name
+     */
     public ClientEnvironment(InetAddress ip, int port, DatagramSocket socket, String fullName) {
         super();
         this.ip = ip;
@@ -62,6 +111,10 @@ public class ClientEnvironment extends JFrame {
         System.out.println("Started message listener worker.");
     }
 
+    /**
+     * Function for handling sending a message to server by user.
+     * @param text Message text
+     */
     public void sendTextMessage(String text) {
         this.disableInput();
 
@@ -74,6 +127,9 @@ public class ClientEnvironment extends JFrame {
         }).start();
     }
 
+    /**
+     * Function handling closing a connection with a server.
+     */
     public void sendCloseMessage() {
         this.disableInput();
 
@@ -81,11 +137,17 @@ public class ClientEnvironment extends JFrame {
             ByeMessage message = new ByeMessage(this.count++, this.uid);
 
             NetworkUtil.sendMessageByAckListCheck(this.ip, this.port, this.socket, message, this.ackMessages);
-        }).start();
 
-        this.worker.cancel(true);
+            this.worker.cancel(true);
+        }).start();
     }
 
+    /**
+     * Function for handling a new text message received.
+     * @param message Message text
+     * @param fullName Sender's full name
+     * @param address Sender's socket address
+     */
     public void handleNewMessage(String message, String fullName, String address) {
         this.textArea.append("[" + address + "] Poruka od korisnika: " + fullName + "\n" + message + "\n\n");
 
@@ -95,14 +157,23 @@ public class ClientEnvironment extends JFrame {
         this.textArea.setCaretPosition(this.textArea.getDocument().getLength());
     }
 
+    /**
+     * Function for enabling a GUI text input.
+     */
     public void enableInput() {
         this.textField.setEditable(true);
     }
 
+    /**
+     * Function for disabling a GUI text input.
+     */
     public void disableInput() {
         this.textField.setEditable(false);
     }
 
+    /**
+     * Function for client GUI initialization.
+     */
     private void initGUI() {
         this.setTitle("Chat client: " + this.fullName.split(" ")[0]);
         this.setSize(400, 300);

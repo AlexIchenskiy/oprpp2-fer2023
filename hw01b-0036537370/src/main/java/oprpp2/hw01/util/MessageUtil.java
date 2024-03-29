@@ -5,8 +5,16 @@ import oprpp2.hw01.message.*;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 
+/**
+ * Class containing utility methods for working with messages.
+ */
 public class MessageUtil {
 
+    /**
+     * Function for retrieving a message from a byte array.
+     * @param data Message data
+     * @return Message
+     */
     public static Message getMessageFromByte(byte[] data) {
         try (ByteArrayInputStream bis = new ByteArrayInputStream(data);
              DataInputStream dis = new DataInputStream(bis)) {

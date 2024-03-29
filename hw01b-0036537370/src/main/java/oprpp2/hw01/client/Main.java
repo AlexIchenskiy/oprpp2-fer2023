@@ -6,8 +6,16 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+/**
+ * A UDP client main class.
+ */
 public class Main {
 
+    /**
+     * Method to run a UDP client.
+     * @param args Numeric IP and port of the server to connect and user's full name like
+     *             127.0.0.1 6000 "Name Surname"
+     */
     public static void main(String[] args) {
         String fullName, name, surname;
         int port;

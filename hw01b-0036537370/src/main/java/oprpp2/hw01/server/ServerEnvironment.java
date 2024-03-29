@@ -13,16 +13,40 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Server environment handling main server logic.
+ */
 public class ServerEnvironment {
 
+    /**
+     * Server IP
+     */
     private final InetAddress ip;
+
+    /**
+     * Server port
+     */
     private final int port;
+
+    /**
+     * Server socket
+     */
     private final DatagramSocket socket;
 
+    /**
+     * Map of user IDs by random key
+     */
     private final Map<Long, Long> uidByKey = new HashMap<>();
 
+    /**
+     * Map of user data by user ID
+     */
     private final Map<Long, ServerClientData> userById = new HashMap<>();
 
+    /**
+     * Initializes a server on the provided port.
+     * @param port Server port
+     */
     public ServerEnvironment(int port) {
         this.ip = (InetAddress) null;
         this.port = port;
@@ -36,6 +60,9 @@ public class ServerEnvironment {
         System.out.println("Started server.");
     }
 
+    /**
+     * Method for listening for any incoming messages.
+     */
     public void listen() {
         System.out.println("Started listening for messages.");
 
@@ -69,12 +96,15 @@ public class ServerEnvironment {
                         new Thread(() -> handleOut(receivePacket)).start();
                         break;
                 }
-            } catch (Exception e) {
-                continue;
+            } catch (Exception ignored) {
             }
         }
     }
 
+    /**
+     * Function for handling a received hello message.
+     * @param inPacket Received hello message packet
+     */
     private void handleHello(DatagramPacket inPacket) {
         HelloMessage message = (HelloMessage) MessageUtil.getMessageFromByte(inPacket.getData());
 
@@ -112,11 +142,14 @@ public class ServerEnvironment {
                     new AckMessage(message.getNumber(), uidByKey.get(message.getKey())));
             System.out.println("Sent ack message with number " + message.getNumber()
                     + " to user with uid " + uid + ".");
-        } catch (Exception e) {
-            return;
+        } catch (Exception ignored) {
         }
     }
 
+    /**
+     * Function for handling a received acknowledgment message.
+     * @param inPacket Received acknowledgment message packet
+     */
     private void handleAck(DatagramPacket inPacket) {
         AckMessage message = (AckMessage) MessageUtil.getMessageFromByte(inPacket.getData());
 
@@ -145,6 +178,10 @@ public class ServerEnvironment {
         }
     }
 
+    /**
+     * Function for handling a received bye message.
+     * @param inPacket Received bye message packet
+     */
     private void handleBye(DatagramPacket inPacket) {
         ByeMessage message = (ByeMessage) MessageUtil.getMessageFromByte(inPacket.getData());
 
@@ -168,6 +205,10 @@ public class ServerEnvironment {
         }
     }
 
+    /**
+     * Function for handling a received out message.
+     * @param inPacket Received out message packet
+     */
     private void handleOut(DatagramPacket inPacket) {
         OutMessage message = (OutMessage) MessageUtil.getMessageFromByte(inPacket.getData());
 
@@ -201,8 +242,7 @@ public class ServerEnvironment {
                     new AckMessage(message.getNumber(), message.getKey()));
             System.out.println("Sent ack message with number " + message.getNumber()
                     + " to user with uid " + message.getKey() + ".");
-        } catch (Exception e) {
-            return;
+        } catch (Exception ignored) {
         }
     }
 

@@ -4,15 +4,30 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+/**
+ * Class representing an acknowledgment message.
+ */
 public class AckMessage extends Message {
 
-    private long key;
+    /**
+     * A message key
+     */
+    private final long key;
 
+    /**
+     * Constructs a new acknowledgment message.
+     * @param number Message number
+     * @param key Message key (UID)
+     */
     public AckMessage(long number, long key) {
         super((byte) 2, number);
         this.key = key;
     }
 
+    /**
+     * Returns a message key.
+     * @return Message key
+     */
     public long getKey() {
         return key;
     }

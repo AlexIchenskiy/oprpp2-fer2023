@@ -7,11 +7,26 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A server worker for one client for sending all messages from a to-be-sent list.
+ */
 public class ServerWorker implements Runnable {
 
+    /**
+     * Data for the current client
+     */
     private final ServerClientData clientData;
+
+    /**
+     * Current client socket
+     */
     private final DatagramSocket socket;
 
+    /**
+     * Constructs a new server worker for provided client data.
+     * @param clientData Client data
+     * @param socket Client socket
+     */
     public ServerWorker(ServerClientData clientData, DatagramSocket socket) {
         this.clientData = clientData;
         this.socket = socket;
@@ -31,6 +46,7 @@ public class ServerWorker implements Runnable {
     @Override
     public void run() {
         System.out.println("Started worker for user: " + this.clientData.getUid());
+
         while (true) {
             InMessage message;
             DatagramPacket packet;
