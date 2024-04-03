@@ -1,5 +1,8 @@
 package hr.fer.oprpp2.webserver;
 
+import hr.fer.oprpp2.custom.scripting.exec.SmartScriptEngine;
+import hr.fer.oprpp2.custom.scripting.parser.SmartScriptParser;
+
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -9,8 +12,13 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SmartHttpServer {
+
+    private final static String WORKER_PREFIX = "/ext/";
+
+    private final static String WORKER_PATH = "hr.fer.oprpp2.webserver.workers.";
 
     private String address;
 
@@ -30,13 +38,21 @@ public class SmartHttpServer {
 
     private Path documentRoot;
 
+    private Map<String,IWebWorker> workersMap = new HashMap<>();
+
+    private Map<String, SessionMapEntry> sessions = new HashMap<>();
+
+    private Random sessionRandom = new Random();
+
     public SmartHttpServer(String configFileName) {
         Properties serverProps = new Properties();
         Properties mimeProps = new Properties();
+        Properties workersProps = new Properties();
 
         try {
             serverProps.load(new FileInputStream(configFileName));
             mimeProps.load(new FileInputStream(serverProps.get("server.mimeConfig").toString()));
+            workersProps.load(new FileInputStream(serverProps.get("server.workers").toString()));
 
             this.address = serverProps.get("server.address").toString();
             this.domainName = serverProps.get("server.domainName").toString();
@@ -48,6 +64,9 @@ public class SmartHttpServer {
             this.serverThread = new ServerThread();
 
             mimeProps.forEach((key, value) -> this.mimeTypes.put(key.toString(), value.toString()));
+            workersProps.forEach((key, value) -> {
+                workersMap.put(key.toString(), loadWorker(value.toString()));
+            });
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Could not load server properties.");
@@ -84,6 +103,18 @@ public class SmartHttpServer {
         }
     }
 
+    private static class SessionMapEntry {
+
+        String sid;
+
+        String host;
+
+        long validUntil;
+
+        Map<String,String> map;
+
+    }
+
     private class ClientWorker implements IDispatcher, Runnable {
 
         private Socket csocket;
@@ -107,6 +138,8 @@ public class SmartHttpServer {
         private List<RequestContext.RCCookie> outputCookies = new ArrayList<>();
 
         private String SID;
+
+        private RequestContext context = null;
 
         public ClientWorker(Socket csocket) {
             super();
@@ -194,6 +227,41 @@ public class SmartHttpServer {
                 return;
             }
 
+            if (directCall && (reqPath.startsWith("/private") || reqPath.startsWith("/private/"))) {
+                this.sendStatusMessage(404, "Not found");
+                return;
+            }
+
+            if (this.context == null) this.context = new RequestContext(this.ostream, this.params,
+                    this.permPrams, this.outputCookies, tempParams, this);
+
+            this.context.setStatusCode(200);
+            this.context.setStatusText("OK");
+
+            String requestedName = urlPath.substring(urlPath.indexOf("/") + 1);
+
+            if (urlPath.toLowerCase().startsWith(WORKER_PREFIX)) {
+                loadWorker(requestedName.replace(WORKER_PREFIX.substring(1), "")).processRequest(this.context);
+                this.ostream.flush();
+                return;
+            }
+
+            AtomicBoolean found = new AtomicBoolean(false);
+
+            workersMap.forEach((key, value) -> {
+                if (key.toLowerCase().endsWith(requestedName.toLowerCase())) {
+                    found.set(true);
+                    try {
+                        value.processRequest(this.context);
+                        this.ostream.flush();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+
+            if (found.get()) return;
+
             String extension;
             if (Files.exists(reqPath) && !Files.isDirectory(reqPath) && Files.isReadable(reqPath)) {
                 extension = urlPath.substring(urlPath.lastIndexOf(".") + 1);
@@ -202,25 +270,30 @@ public class SmartHttpServer {
                 return;
             }
 
-            String mimeType = mimeTypes.getOrDefault(extension, "application/octet-stream");
+            if (extension.equals("smscr")) {
+                String docBody = Files.readString(reqPath);
+                new SmartScriptEngine(
+                        new SmartScriptParser(docBody).getDocumentNode(), this.context
+                ).execute();
+            } else {
 
-            RequestContext rc = new RequestContext(ostream, params, permPrams, outputCookies);
-            rc.setMimeType(mimeType);
-            rc.setStatusCode(200);
+                String mimeType = mimeTypes.getOrDefault(extension, "application/octet-stream");
+                this.context.setMimeType(mimeType);
 
-            try (BufferedInputStream bis = new BufferedInputStream(Files.newInputStream(reqPath))) {
-                byte[] buffer = new byte[8192];
-                int read;
+                try (BufferedInputStream bis = new BufferedInputStream(Files.newInputStream(reqPath))) {
+                    byte[] buffer = new byte[8192];
+                    int read;
 
-                while (true) {
-                    read = bis.read(buffer);
-                    if (read == -1) break;
-                    rc.write(buffer, 0, read);
+                    while (true) {
+                        read = bis.read(buffer);
+                        if (read == -1) break;
+                        this.context.write(buffer, 0, read);
+                    }
+
+                    this.ostream.flush();
+                } catch (IOException e) {
+                    throw new RuntimeException("Could not send message.");
                 }
-
-                this.ostream.flush();
-            } catch (IOException e) {
-                throw new RuntimeException("Could not send message.");
             }
         }
 
@@ -300,15 +373,29 @@ public class SmartHttpServer {
         }
 
         private void parseParameters(String paramString) {
-            System.out.println("Param: " + paramString);
-            String[] params = paramString.split("&");
+            String[] parameters = paramString.split("&");
 
-            for (String param : params) {
+            for (String param : parameters) {
                 String[] parts = param.split("=");
-                tempParams.put(parts[0], parts[1]);
+                params.put(parts[0], parts[1]);
             }
         }
 
+    }
+
+    private static IWebWorker loadWorker(String name) {
+        Class<?> referenceToClass;
+        Object newObject;
+        String value = name.startsWith(WORKER_PATH) ? name : WORKER_PATH + name;
+
+        try {
+            referenceToClass = Class.forName(value);
+            newObject = referenceToClass.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return (IWebWorker) newObject;
     }
 
 }
