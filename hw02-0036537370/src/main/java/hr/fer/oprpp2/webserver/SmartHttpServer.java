@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SmartHttpServer {
@@ -34,6 +35,8 @@ public class SmartHttpServer {
     private Map<String,String> mimeTypes = new HashMap<>();
 
     private ServerThread serverThread;
+
+    private DaemonCleaner daemonCleaner;
 
     private ExecutorService threadPool;
 
@@ -63,6 +66,7 @@ public class SmartHttpServer {
             this.documentRoot = Paths.get(serverProps.get("server.documentRoot").toString());
 
             this.serverThread = new ServerThread();
+            this.daemonCleaner = new DaemonCleaner();
 
             mimeProps.forEach((key, value) -> this.mimeTypes.put(key.toString(), value.toString()));
             workersProps.forEach((key, value) -> {
@@ -80,10 +84,17 @@ public class SmartHttpServer {
         this.threadPool = Executors.newFixedThreadPool(workerThreads);
 
         if (!this.serverThread.isAlive()) this.serverThread.start();
+
+        if (!this.daemonCleaner.isAlive()) {
+            this.daemonCleaner.setDaemon(true);
+            this.daemonCleaner.start();
+        }
     }
 
     protected synchronized void stop() {
         if (!this.serverThread.isInterrupted()) this.serverThread.interrupt();
+
+        if (!this.daemonCleaner.isInterrupted()) this.daemonCleaner.interrupt();
 
         this.threadPool.shutdown();
     }
@@ -93,13 +104,32 @@ public class SmartHttpServer {
         public void run() {
             try (ServerSocket serverSocket = new ServerSocket()) {
                 serverSocket.bind(new InetSocketAddress(address, port));
-                while (true) {
+                while (!this.isInterrupted()) {
                     Socket client = serverSocket.accept();
                     ClientWorker cw = new ClientWorker(client);
                     threadPool.submit(cw);
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Could not initialize server thread.");
+            }
+        }
+    }
+
+    protected class DaemonCleaner extends Thread {
+        @Override
+        public void run() {
+            while (!this.isInterrupted()) {
+                try {
+                    TimeUnit.MINUTES.sleep(5);
+                } catch (InterruptedException e) {
+                    break;
+                }
+
+                sessions.forEach((key, value) -> {
+                    if (value.getValidUntil() < new Date().getTime()) {
+                        sessions.remove(key);
+                    }
+                });
             }
         }
     }
@@ -251,6 +281,7 @@ public class SmartHttpServer {
 
         private void internalDispatchRequest(String urlPath, boolean directCall)
                 throws Exception {
+            if (urlPath.equals("/")) urlPath = "/index2.html";
             Path reqPath = Paths.get(documentRoot.toString(), urlPath);
             if (!reqPath.startsWith(documentRoot.toString())) {
                 this.sendStatusMessage(403, "Forbidden");
