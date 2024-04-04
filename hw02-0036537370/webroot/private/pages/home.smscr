@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {background-color: #{$= "background" "#FF7755" @tparamGet $};}
+        </style>
+    </head>
+    <body>
+        <h1>Pages</h1>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            <a href="/scripts/osnovni.smscr">Osnovni</a>
+            <a href="/scripts/brojPoziva.smscr">Broj poziva</a>
+            <a href="/scripts/fibonaccih.smscr">Fibonacci</a>
+        </div>
+        <h1>Worker pages</h1>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            <a href="/hello">Hello worker</a>
+            <a href="/cw">Circle worker</a>
+        </div>
+        <br />
+        <br />
+        <br />
+        <form action="/scripts/zbrajanje.smscr" method="get">
+            <label for="fname">First number:</label>
+            <input type="text" id="a" name="a"><br><br>
+            <label for="lname">Second number:</label>
+            <input type="text" id="b" name="b"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+        <br />
+        <br />
+        <br />
+        <form action="/setbgcolor" method="get">
+            <label for="bgcolor">Select Background Color:</label>
+            <select id="bgcolor" name="bgcolor" required>
+                <option value="FFFFFF">White</option>
+                <option value="FFA500">Orange</option>
+                <option value="FF0000">Red</option>
+                <option value="00FF00">Green</option>
+                <option value="FFC0CB">Pink</option>
+            </select>
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>

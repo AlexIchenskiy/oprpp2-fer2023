@@ -19,8 +19,7 @@ public class DemoRequestContext {
     private static void demo1(String filePath, String encoding) throws IOException {
         OutputStream os = Files.newOutputStream(Paths.get(filePath));
         RequestContext rc = new RequestContext(os, new HashMap<String, String>(),
-                new HashMap<String, String>(),
-                new ArrayList<RequestContext.RCCookie>());
+                new HashMap<String, String>(), new ArrayList<RequestContext.RCCookie>(), "");
         rc.setEncoding(encoding);
         rc.setMimeType("text/plain");
         rc.setStatusCode(205);
@@ -34,7 +33,7 @@ public class DemoRequestContext {
         OutputStream os = Files.newOutputStream(Paths.get(filePath));
         RequestContext rc = new RequestContext(os, new HashMap<String, String>(),
                 new HashMap<String, String>(),
-                new ArrayList<RequestContext.RCCookie>());
+                new ArrayList<RequestContext.RCCookie>(), "");
         rc.setEncoding(encoding);
         rc.setMimeType("text/plain");
         rc.setStatusCode(205);

@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,7 +41,7 @@ public class SmartHttpServer {
 
     private Map<String,IWebWorker> workersMap = new HashMap<>();
 
-    private Map<String, SessionMapEntry> sessions = new HashMap<>();
+    private Map<String, SessionMapEntry> sessions = new ConcurrentHashMap<>();
 
     private Random sessionRandom = new Random();
 
@@ -105,13 +106,40 @@ public class SmartHttpServer {
 
     private static class SessionMapEntry {
 
-        String sid;
+        private String sid;
 
-        String host;
+        private String host;
 
-        long validUntil;
+        private long validUntil;
 
-        Map<String,String> map;
+        private Map<String,String> map;
+
+        public SessionMapEntry(String sid, String host, long validUntil, Map<String, String> map) {
+            this.sid = sid;
+            this.host = host;
+            this.validUntil = validUntil;
+            this.map = map;
+        }
+
+        public String getSid() {
+            return sid;
+        }
+
+        public String getHost() {
+            return host;
+        }
+
+        public long getValidUntil() {
+            return validUntil;
+        }
+
+        public Map<String, String> getMap() {
+            return map;
+        }
+
+        public void setValidUntil(long validUntil) {
+            this.validUntil = validUntil;
+        }
 
     }
 
@@ -197,6 +225,8 @@ public class SmartHttpServer {
             String[] pathParts = requestedPath.split("[?]");
             String path = pathParts[0];
 
+            this.checkSession(headers);
+
             if (pathParts.length > 1) {
                 this.parseParameters(pathParts[1]);
             }
@@ -233,7 +263,7 @@ public class SmartHttpServer {
             }
 
             if (this.context == null) this.context = new RequestContext(this.ostream, this.params,
-                    this.permPrams, this.outputCookies, tempParams, this);
+                    this.permPrams, this.outputCookies, this.SID, tempParams, this);
 
             this.context.setStatusCode(200);
             this.context.setStatusText("OK");
@@ -276,7 +306,6 @@ public class SmartHttpServer {
                         new SmartScriptParser(docBody).getDocumentNode(), this.context
                 ).execute();
             } else {
-
                 String mimeType = mimeTypes.getOrDefault(extension, "application/octet-stream");
                 this.context.setMimeType(mimeType);
 
@@ -354,7 +383,8 @@ public class SmartHttpServer {
         }
 
         private void sendMessage(int statusCode, String statusMessage, String message) {
-            RequestContext context = new RequestContext(this.ostream, this.params, this.permPrams, this.outputCookies);
+            RequestContext context = new RequestContext(this.ostream, this.params, this.permPrams,
+                    this.outputCookies, this.SID);
 
             context.setStatusCode(statusCode);
             context.setStatusText(statusMessage);
@@ -379,6 +409,48 @@ public class SmartHttpServer {
                 String[] parts = param.split("=");
                 params.put(parts[0], parts[1]);
             }
+        }
+
+        private synchronized void checkSession(Map<String, String> headers) {
+            Map<String, List<String>> cookies = new HashMap<>();
+
+            headers.forEach((key, value) -> {
+                if (key.startsWith("Cookie")) {
+                    String[] cookiesParts = value.replaceAll("\"", "").split(";");
+
+                    for (String cookiesPart : cookiesParts) {
+                        String[] cookieParts = cookiesPart.replace("\"", "").split("=");
+                        cookies.put(cookieParts[0], Arrays.stream(cookieParts[1].split(",")).toList());
+                    }
+                }
+            });
+
+            this.SID = cookies.get("sid") == null ? this.generateSid() : cookies.get("sid").get(0);
+
+            SessionMapEntry entry = sessions.get(this.SID);
+
+            long time = new Date().getTime();
+
+            if (entry == null || !entry.getHost().equals(this.host)
+                    || entry.getValidUntil() < time) {
+                sessions.put(this.SID, new SessionMapEntry(this.SID, this.host,
+                        time + sessionTimeout * 1000L, new ConcurrentHashMap<>()));
+            } else {
+                entry.setValidUntil(time + sessionTimeout * 1000L);
+            }
+
+            this.outputCookies.add(new RequestContext.RCCookie("sid", this.SID,
+                    null, this.host.split(":")[0], "/"));
+
+            this.permPrams = sessions.get(this.SID).getMap();
+        }
+
+        private String generateSid() {
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < 20; i++) sb.append((char) (65 + sessionRandom.nextInt(26)));
+
+            return sb.toString();
         }
 
     }

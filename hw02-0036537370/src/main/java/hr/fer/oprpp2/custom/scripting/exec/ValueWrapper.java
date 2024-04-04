@@ -58,16 +58,15 @@ public class ValueWrapper {
 
     private Object parseValue(Object value) {
         Object val = value == null ? Integer.valueOf(0) : value;
+        val = String.valueOf(val).replaceAll("\"", "");
 
-        if (val instanceof String) {
+        try {
+            val = Double.parseDouble((String) val);
+        } catch (Exception e) {
             try {
-                val = Double.parseDouble((String) val);
-            } catch (Exception e) {
-                try {
-                    val = Integer.parseInt((String) val);
-                } catch (Exception e1) {
-                    throw new RuntimeException("Invalid data format provided.");
-                }
+                val = Integer.parseInt((String) val);
+            } catch (Exception e1) {
+                throw new RuntimeException("Invalid data format provided.");
             }
         }
 
@@ -96,8 +95,8 @@ public class ValueWrapper {
     }
 
     private void performOperation(Object value, int operation) {
-        double val1 = Double.parseDouble(String.valueOf(this.parseValue(this.value)));
-        double val2 = Double.parseDouble(String.valueOf(this.parseValue(value)));
+        Double val1 = Double.parseDouble(String.valueOf(this.parseValue(this.value)).replace("\"", ""));
+        Double val2 = Double.parseDouble(String.valueOf(this.parseValue(value)).replace("\"", ""));
 
         Object result = switch (operation) {
             case 0 -> val1 + val2;

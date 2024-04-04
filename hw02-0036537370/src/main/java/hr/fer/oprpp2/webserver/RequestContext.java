@@ -34,18 +34,21 @@ public class RequestContext {
 
     private IDispatcher dispatcher;
 
+    private String SID;
+
     public RequestContext(OutputStream outputStream, Map<String, String> parameters,
-                          Map<String, String> persistentParameters, List<RCCookie> outputCookies) {
+                          Map<String, String> persistentParameters, List<RCCookie> outputCookies, String SID) {
         this.outputStream = Objects.requireNonNull(outputStream, "Output stream cant be null.");
         this.parameters = (parameters == null) ? new HashMap<>() : parameters;
         this.persistentParameters = (persistentParameters == null) ? new HashMap<>() : persistentParameters;
         this.outputCookies = (outputCookies == null) ? new ArrayList<>() : outputCookies;
+        this.SID = SID;
     }
 
     public RequestContext(OutputStream outputStream, Map<String, String> parameters,
-                          Map<String, String> persistentParameters, List<RCCookie> outputCookies,
+                          Map<String, String> persistentParameters, List<RCCookie> outputCookies, String SID,
                           Map<String, String> temporaryParameters, IDispatcher dispatcher) {
-        this(outputStream, parameters, persistentParameters, outputCookies);
+        this(outputStream, parameters, persistentParameters, outputCookies, SID);
         this.temporaryParameters = temporaryParameters;
         this.dispatcher = dispatcher;
     }
@@ -121,7 +124,7 @@ public class RequestContext {
     }
 
     public String getSessionID() {
-        return "";
+        return this.SID;
     }
 
     public void setTemporaryParameter(String name, String value) {
@@ -177,6 +180,7 @@ public class RequestContext {
             if (cookie.getDomain() != null) sb.append("; Domain=").append(cookie.getDomain());
             if (cookie.getPath() != null) sb.append("; Path=").append(cookie.getPath());
             if (cookie.getMaxAge() != null) sb.append("; Max-Age=").append(cookie.getMaxAge());
+            if (cookie.name.equals("sid")) sb.append("; HttpOnly");
             sb.append("\r\n");
         });
 
@@ -198,7 +202,6 @@ public class RequestContext {
         private final String domain;
 
         private final String path;
-
 
         public RCCookie(String name, String value, Integer maxAge, String domain, String path) {
             this.name = name;

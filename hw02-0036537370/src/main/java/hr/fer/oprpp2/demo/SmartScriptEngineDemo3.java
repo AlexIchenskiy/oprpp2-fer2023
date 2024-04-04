@@ -26,7 +26,7 @@ public class SmartScriptEngineDemo3 {
         List<RequestContext.RCCookie> cookies = new ArrayList<>();
         persistentParameters.put("brojPoziva", "3");
         RequestContext rc = new RequestContext(System.out, parameters, persistentParameters,
-                cookies);
+                cookies, "");
         new SmartScriptEngine(
                 new SmartScriptParser(documentBody).getDocumentNode(), rc
         ).execute();

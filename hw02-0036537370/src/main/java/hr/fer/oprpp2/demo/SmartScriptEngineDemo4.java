@@ -28,7 +28,7 @@ public class SmartScriptEngineDemo4 {
         // create engine and execute it
         new SmartScriptEngine(
                 new SmartScriptParser(documentBody).getDocumentNode(),
-                new RequestContext(System.out, parameters, persistentParameters, cookies)
+                new RequestContext(System.out, parameters, persistentParameters, cookies, "")
         ).execute();
     }
 
