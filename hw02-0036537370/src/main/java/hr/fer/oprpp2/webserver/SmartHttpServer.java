@@ -16,11 +16,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Class representing an HTTP server.
+ */
 public class SmartHttpServer {
 
     private final static String WORKER_PREFIX = "/ext/";
 
     private final static String WORKER_PATH = "hr.fer.oprpp2.webserver.workers.";
+
+    private final static int COOKIE_CLEAN_TIMEOUT = 5;
 
     private String address;
 
@@ -99,6 +104,9 @@ public class SmartHttpServer {
         this.threadPool.shutdown();
     }
 
+    /**
+     * Class representing a server listener thread.
+     */
     protected class ServerThread extends Thread {
         @Override
         public void run() {
@@ -115,12 +123,15 @@ public class SmartHttpServer {
         }
     }
 
+    /**
+     * Class representing a daemon thread for auto-cleaning expired cookies every X minutes.
+     */
     protected class DaemonCleaner extends Thread {
         @Override
         public void run() {
             while (!this.isInterrupted()) {
                 try {
-                    TimeUnit.MINUTES.sleep(5);
+                    TimeUnit.MINUTES.sleep(COOKIE_CLEAN_TIMEOUT);
                 } catch (InterruptedException e) {
                     break;
                 }
@@ -134,6 +145,9 @@ public class SmartHttpServer {
         }
     }
 
+    /**
+     * Class representing an entry for server clients session map.
+     */
     private static class SessionMapEntry {
 
         private String sid;
@@ -173,6 +187,9 @@ public class SmartHttpServer {
 
     }
 
+    /**
+     * Class representing a single worker for client request.
+     */
     private class ClientWorker implements IDispatcher, Runnable {
 
         private Socket csocket;
@@ -274,11 +291,22 @@ public class SmartHttpServer {
             }
         }
 
+        /**
+         * Method for dispatching indirect requests.
+         * @param urlPath Requested url path
+         * @throws Exception Error while dispatching a request
+         */
         @Override
         public void dispatchRequest(String urlPath) throws Exception {
             internalDispatchRequest(urlPath, false);
         }
 
+        /**
+         * Method for dispatching internal requests.
+         * @param urlPath Requested url path
+         * @param directCall Is request direct
+         * @throws Exception Error while dispatching a request
+         */
         private void internalDispatchRequest(String urlPath, boolean directCall)
                 throws Exception {
             if (urlPath.equals("/")) urlPath = "/index2.html";
@@ -486,6 +514,11 @@ public class SmartHttpServer {
 
     }
 
+    /**
+     * Method for retrieving a web worker from its name.
+     * @param name Name of the desired worker
+     * @return Retrieved worker
+     */
     private static IWebWorker loadWorker(String name) {
         Class<?> referenceToClass;
         Object newObject;

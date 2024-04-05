@@ -6,6 +6,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Class representing a HTTP request context.
+ */
 public class RequestContext {
 
     private final OutputStream outputStream;
@@ -135,6 +138,12 @@ public class RequestContext {
         this.temporaryParameters.remove(name);
     }
 
+    /**
+     * Write a byte data to the request.
+     * @param data Data to be written
+     * @return Request after writing
+     * @throws IOException Error while writing to the request
+     */
     public RequestContext write(byte[] data) throws IOException {
         this.generateHeader();
 
@@ -143,6 +152,14 @@ public class RequestContext {
         return this;
     }
 
+    /**
+     * Write byte data of predefined length and with a defined offset to the request.
+     * @param data Data to be written
+     * @param offset Writing offset
+     * @param len Data length
+     * @return Request after writing
+     * @throws IOException Error while writing to the request
+     */
     public RequestContext write(byte[] data, int offset, int len) throws IOException {
         this.generateHeader();
 
@@ -151,6 +168,12 @@ public class RequestContext {
         return this;
     }
 
+    /**
+     * Write a single string to the request.
+     * @param text Text to be added to the request
+     * @return Request after writing
+     * @throws IOException Error while writing to the request
+     */
     public RequestContext write(String text) throws IOException {
         this.generateHeader();
 
@@ -191,6 +214,9 @@ public class RequestContext {
         this.headerGenerated = true;
     }
 
+    /**
+     * Class representing a simple cookie for a request context.
+     */
     public static class RCCookie {
 
         private final String name;

@@ -10,6 +10,9 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * Class representing a visitor of smart script nodes.
+ */
 public class SmartScriptNodeVisitor implements INodeVisitor {
 
     private final RequestContext context;

@@ -9,6 +9,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+/**
+ * Class representing a worker for generating a png circle.
+ */
 public class CircleWorker implements IWebWorker {
 
     @Override

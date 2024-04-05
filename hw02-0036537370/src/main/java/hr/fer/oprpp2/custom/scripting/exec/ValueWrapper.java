@@ -2,6 +2,9 @@ package hr.fer.oprpp2.custom.scripting.exec;
 
 import java.util.Objects;
 
+/**
+ * Class representing a wrapper for numeric values.
+ */
 public class ValueWrapper {
 
     private Object value;
@@ -94,6 +97,11 @@ public class ValueWrapper {
         return false;
     }
 
+    /**
+     * Perform an operation on the value stored in the wrapper.
+     * @param value Operand
+     * @param operation Operation
+     */
     private void performOperation(Object value, int operation) {
         Double val1 = Double.parseDouble(String.valueOf(this.parseValue(this.value)).replace("\"", ""));
         Double val2 = Double.parseDouble(String.valueOf(this.parseValue(value)).replace("\"", ""));

@@ -6,6 +6,9 @@ import hr.fer.oprpp2.webserver.RequestContext;
 import java.io.IOException;
 import java.util.Set;
 
+/**
+ * Class representing a web worker for echoing provided parameters.
+ */
 public class EchoWorker implements IWebWorker {
 
     @Override

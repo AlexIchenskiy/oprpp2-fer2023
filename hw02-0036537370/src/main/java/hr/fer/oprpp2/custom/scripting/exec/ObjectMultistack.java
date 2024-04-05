@@ -3,6 +3,9 @@ package hr.fer.oprpp2.custom.scripting.exec;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class representing a map-like structure where each value is a linked-list-like stack.
+ */
 public class ObjectMultistack {
 
     private final Map<String, MultistackEntry> map = new HashMap<>();
@@ -18,6 +21,11 @@ public class ObjectMultistack {
         this.map.put(keyName, entry);
     }
 
+    /**
+     * Return and remove a value from the top of the stack defined by key.
+     * @param keyName Key name for the desired stack
+     * @return Value from the stack top
+     */
     public ValueWrapper pop(String keyName) {
         MultistackEntry entry = this.map.get(keyName);
 
@@ -32,6 +40,11 @@ public class ObjectMultistack {
         return entry.getValue();
     }
 
+    /**
+     * Return a value from the top of the stack defined by key.
+     * @param keyName Key name for the desired stack
+     * @return Value from the stack top
+     */
     public ValueWrapper peek(String keyName) {
         MultistackEntry entry = this.map.get(keyName);
 
@@ -40,10 +53,18 @@ public class ObjectMultistack {
         return this.map.get(keyName).getValue();
     }
 
+    /**
+     * Check if a stack defined by the provided key is empty.
+     * @param keyName Key name for the desired stack
+     * @return Boolean representing whether the corresponding stack is empty
+     */
     public boolean isEmpty(String keyName) {
         return !map.containsKey(keyName);
     }
 
+    /**
+     * Class representing an entry for the multistack map structure.
+     */
     public static class MultistackEntry {
 
         private ValueWrapper value;

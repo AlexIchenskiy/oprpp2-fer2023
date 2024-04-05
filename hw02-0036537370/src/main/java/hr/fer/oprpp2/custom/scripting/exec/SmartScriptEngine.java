@@ -4,6 +4,9 @@ import hr.fer.oprpp2.custom.scripting.nodes.DocumentNode;
 import hr.fer.oprpp2.custom.scripting.nodes.INodeVisitor;
 import hr.fer.oprpp2.webserver.RequestContext;
 
+/**
+ * Class representing an engine for smart script execution.
+ */
 public class SmartScriptEngine {
 
     private final DocumentNode documentNode;

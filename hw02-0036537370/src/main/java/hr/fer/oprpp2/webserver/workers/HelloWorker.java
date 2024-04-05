@@ -7,6 +7,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Class representing a hello-name web worker for generating a simple HTML page
+ * with query parameters.
+ */
 public class HelloWorker implements IWebWorker {
 
     @Override

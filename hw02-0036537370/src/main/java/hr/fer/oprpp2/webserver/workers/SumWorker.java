@@ -3,6 +3,9 @@ package hr.fer.oprpp2.webserver.workers;
 import hr.fer.oprpp2.webserver.IWebWorker;
 import hr.fer.oprpp2.webserver.RequestContext;
 
+/**
+ * Class representing a simple sum calculator web worker.
+ */
 public class SumWorker implements IWebWorker {
 
     @Override

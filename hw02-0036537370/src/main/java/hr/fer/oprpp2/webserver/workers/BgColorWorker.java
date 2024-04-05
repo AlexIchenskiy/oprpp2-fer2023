@@ -3,6 +3,9 @@ package hr.fer.oprpp2.webserver.workers;
 import hr.fer.oprpp2.webserver.IWebWorker;
 import hr.fer.oprpp2.webserver.RequestContext;
 
+/**
+ * Class representing a web worker for persistent background color change.
+ */
 public class BgColorWorker implements IWebWorker {
 
     @Override
