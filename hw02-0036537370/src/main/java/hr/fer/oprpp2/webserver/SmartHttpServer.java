@@ -68,7 +68,7 @@ public class SmartHttpServer {
             this.port = Integer.parseInt(serverProps.get("server.port").toString());
             this.workerThreads = Integer.parseInt(serverProps.get("server.workerThreads").toString());
             this.sessionTimeout = Integer.parseInt(serverProps.get("session.timeout").toString());
-            this.documentRoot = Paths.get(serverProps.get("server.documentRoot").toString());
+            this.documentRoot = Paths.get(serverProps.get("server.documentRoot").toString()).toAbsolutePath();
 
             this.serverThread = new ServerThread();
             this.daemonCleaner = new DaemonCleaner();
