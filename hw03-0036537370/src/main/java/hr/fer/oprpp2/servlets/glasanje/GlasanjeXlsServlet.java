@@ -15,9 +15,19 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Servlet for generating voting Excel data table
+ */
 @WebServlet(name = "Glasanje XLS", urlPatterns = "/glasanje-xls")
 public class GlasanjeXlsServlet extends HttpServlet {
 
+    /**
+     * Method for generating a voting Excel data table
+     * @param req HTTP Request
+     * @param resp HTTP Response
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try (HSSFWorkbook workbook = new HSSFWorkbook()) {

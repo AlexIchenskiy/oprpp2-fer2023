@@ -9,9 +9,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Servlet for generating trigonometric functions data
+ */
 @WebServlet(name = "Trigonometric", urlPatterns = "/trigonometric")
 public class TrigonometricServlet extends HttpServlet {
 
+    /**
+     * Method for generating trigonometric functions data from A to B where A and B are
+     * URL parameters (or else default values)
+     * @param req HTTP Request
+     * @param resp HTTP Response
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         int a, b;

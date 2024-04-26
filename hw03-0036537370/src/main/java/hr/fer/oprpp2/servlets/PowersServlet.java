@@ -12,9 +12,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Servlet for generating an Excel data table with number powers
+ */
 @WebServlet(name = "Powers", urlPatterns = "/powers")
 public class PowersServlet extends HttpServlet {
 
+    /**
+     * Method for generating N (1-5) sheets of powers of numbers from A (1-100) to B (1-100)
+     * where N, A, B are URL parameters
+     * @param req HTTP Request
+     * @param resp HTTP Response
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Integer a = null, b = null, n = null;

@@ -1,5 +1,8 @@
 package hr.fer.oprpp2.util.glasanje;
 
+/**
+ * A class for storing the voting data for a single band.
+ */
 public class GlasanjeData {
 
     private final Integer id;

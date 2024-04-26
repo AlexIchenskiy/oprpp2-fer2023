@@ -12,9 +12,19 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Voting results servlet.
+ */
 @WebServlet(name = "Rezultati", urlPatterns = "/glasanje-rezultati")
 public class GlasanjeRezultatiServlet extends HttpServlet {
 
+    /**
+     * Method for generating and dispatching voting results
+     * @param req HTTP Request
+     * @param resp HTTP Response
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {

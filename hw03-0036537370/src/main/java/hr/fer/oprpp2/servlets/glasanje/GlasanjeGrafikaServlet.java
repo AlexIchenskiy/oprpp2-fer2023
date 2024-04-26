@@ -15,12 +15,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
 import java.util.List;
 
+/**
+ * Voting graphics servlet.
+ */
 @WebServlet(name = "Glasanje Graf", urlPatterns = "/glasanje-grafika")
 public class GlasanjeGrafikaServlet extends HttpServlet {
 
+    /**
+     * Method for generating a voting chart
+     * @param req HTTP Request
+     * @param resp HTTP Response
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
