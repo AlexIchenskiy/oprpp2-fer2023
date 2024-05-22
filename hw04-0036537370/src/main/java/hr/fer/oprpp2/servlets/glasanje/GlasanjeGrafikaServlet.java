@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Voting graphics servlet.
  */
-@WebServlet(name = "Glasanje Graf", urlPatterns = "/glasanje-grafika")
+@WebServlet(name = "Glasanje Graf", urlPatterns = "/servleti/glasanje-grafika")
 public class GlasanjeGrafikaServlet extends HttpServlet {
 
     /**
@@ -37,7 +37,7 @@ public class GlasanjeGrafikaServlet extends HttpServlet {
 
             OutputStream os = resp.getOutputStream();
 
-            List<PollOption> data = DAOProvider.getDao().getPollOptions(Long.parseLong(req.getParameter("id")));
+            List<PollOption> data = DAOProvider.getDao().getPollOptions(Long.parseLong(req.getParameter("pollID")));
 
             JFreeChart chart = getChart(data.stream().map(PollOption::getOptionTitle).toList(),
                     data.stream().map(PollOption::getVotesCount).toList());
@@ -46,7 +46,7 @@ public class GlasanjeGrafikaServlet extends HttpServlet {
 
             ChartUtilities.writeChartAsPNG(os, chart, width, height);
         } catch (Exception e) {
-            NetworkUtil.throwNetworkError(req, resp, e.getMessage());
+            NetworkUtil.throwNetworkError(req, resp, e.getMessage(), e);
         }
     }
 

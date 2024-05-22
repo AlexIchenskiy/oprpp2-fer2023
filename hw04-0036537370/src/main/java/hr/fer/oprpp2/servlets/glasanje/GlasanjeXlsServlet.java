@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Servlet for generating voting Excel data table
  */
-@WebServlet(name = "Glasanje XLS", urlPatterns = "/glasanje-xls")
+@WebServlet(name = "Glasanje XLS", urlPatterns = "/servleti/glasanje-xls")
 public class GlasanjeXlsServlet extends HttpServlet {
 
     /**
@@ -31,7 +31,7 @@ public class GlasanjeXlsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try (HSSFWorkbook workbook = new HSSFWorkbook()) {
-            List<PollOption> data = DAOProvider.getDao().getPollOptions(Long.parseLong(req.getParameter("id")),
+            List<PollOption> data = DAOProvider.getDao().getPollOptions(Long.parseLong(req.getParameter("pollID")),
                     "votesCount");
             HSSFSheet sheet = workbook.createSheet("Results");
 
@@ -55,7 +55,7 @@ public class GlasanjeXlsServlet extends HttpServlet {
 
             workbook.write(resp.getOutputStream());
         } catch (Exception e) {
-            NetworkUtil.throwNetworkError(req, resp, e.getMessage());
+            NetworkUtil.throwNetworkError(req, resp, e.getMessage(), e);
         }
     }
 

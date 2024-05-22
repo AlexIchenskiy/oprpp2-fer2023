@@ -23,4 +23,6 @@ public interface DAO {
 
     List<String> getWinnerVideos(long pollId);
 
+    Poll getPollById(long pollId);
+
 }

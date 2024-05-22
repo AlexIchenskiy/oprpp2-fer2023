@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * Voting results servlet.
  */
-@WebServlet(name = "Rezultati", urlPatterns = "/glasanje-rezultati")
+@WebServlet(name = "Rezultati", urlPatterns = "/servleti/glasanje-rezultati")
 public class GlasanjeRezultatiServlet extends HttpServlet {
 
     /**
@@ -28,18 +28,20 @@ public class GlasanjeRezultatiServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            Long id = Long.parseLong(req.getParameter("id"));
+            long id = Long.parseLong(req.getParameter("pollID"));
 
             List<PollOption> data = DAOProvider.getDao().getPollOptions(id, "votesCount");
 
+            Collections.reverse(data);
+
+            req.setAttribute("pollID", id);
             req.setAttribute("names", data.stream().map(PollOption::getOptionTitle).toList());
             req.setAttribute("res", data.stream().map(PollOption::getVotesCount).toList());
             req.setAttribute("videos", DAOProvider.getDao().getWinnerVideos(id));
 
             req.getRequestDispatcher("/WEB-INF/pages/glasanjeRez.jsp").forward(req, resp);
         } catch (Exception e) {
-            e.printStackTrace();
-            NetworkUtil.throwNetworkError(req, resp, e.getMessage());
+            NetworkUtil.throwNetworkError(req, resp, e.getMessage(), e);
         }
     }
 

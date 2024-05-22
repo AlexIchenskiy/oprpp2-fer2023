@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * Voting servlet.
  */
-@WebServlet(name = "Glasaj", urlPatterns = "/glasanje-glasaj")
+@WebServlet(name = "Glasaj", urlPatterns = "/servleti/glasanje-glasaj")
 public class GlasanjeGlasajServlet extends HttpServlet {
 
     /**
@@ -25,13 +25,17 @@ public class GlasanjeGlasajServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            DAOProvider.getDao().vote(Long.parseLong(req.getParameter("id")));
-        } catch (Exception e) {
-            NetworkUtil.throwNetworkError(req, resp, e.getMessage());
-        }
+        long pollId, optionId;
 
-        resp.sendRedirect(req.getContextPath() + "/glasanje-rezultati");
+        try {
+            pollId = Long.parseLong(req.getParameter("pollID"));
+            optionId = Long.parseLong(req.getParameter("optionID"));
+            DAOProvider.getDao().vote(optionId);
+
+            resp.sendRedirect(req.getContextPath() + "/servleti/glasanje-rezultati?pollID=" + pollId);
+        } catch (Exception e) {
+            NetworkUtil.throwNetworkError(req, resp, e.getMessage(), e);
+        }
     }
 
 }

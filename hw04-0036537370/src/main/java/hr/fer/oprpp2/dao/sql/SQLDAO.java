@@ -24,7 +24,15 @@ import java.util.List;
 public class SQLDAO implements DAO {
 
     public void vote(long pollOptionId) {
+        Connection con = SQLConnectionProvider.getConnection();
 
+        try (PreparedStatement statement = con.prepareStatement(
+                "UPDATE PollOptions SET votesCount = votesCount + 1 WHERE id = ?")) {
+            statement.setLong(1, pollOptionId);
+            statement.execute();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not vote.");
+        }
     }
 
     public List<PollOption> getPollOptions(long pollId) {
@@ -93,20 +101,44 @@ public class SQLDAO implements DAO {
                     FROM PollOptions
                     WHERE pollID = ?
                 )
-                ORDER BY optionTitle;
+                ORDER BY optionTitle
                 """;
 
-        try (PreparedStatement statement = con.prepareStatement(query);
-             ResultSet rs = statement.executeQuery()) {
+        try (PreparedStatement statement = con.prepareStatement(query)) {
             List<String> videos = new ArrayList<>();
 
+            statement.setLong(1, pollId);
+            statement.setLong(2, pollId);
+
+            ResultSet rs = statement.executeQuery();
+
             while (rs.next()) {
-                videos.add(rs.getString("optionTitle"));
+                videos.add(rs.getString("optionLink"));
             }
 
             return videos;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Could not get winner videos list.");
+        }
+    }
+
+    public Poll getPollById(long pollId) {
+        Connection con = SQLConnectionProvider.getConnection();
+
+        try (PreparedStatement statement = con.prepareStatement(
+                "SELECT id, title, message FROM POLLS WHERE id = ?")) {
+            statement.setLong(1, pollId);
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {
+                return new Poll(rs.getLong("id"), rs.getString("title"), rs.getString("message"));
+            } else {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Could not get polls list.");
         }
     }
 
