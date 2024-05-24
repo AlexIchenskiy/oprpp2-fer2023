@@ -50,6 +50,12 @@ public class GlasanjeGrafikaServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Method for generating a chart from provided data.
+     * @param names Poll option names
+     * @param res Pol options vote counts
+     * @return A chart with poll results
+     */
     public JFreeChart getChart(List<String> names, List<Long> res) {
         var dataset = new DefaultPieDataset();
 

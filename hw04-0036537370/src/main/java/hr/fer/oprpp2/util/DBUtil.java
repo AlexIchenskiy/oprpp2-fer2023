@@ -11,8 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * Database util class.
+ */
 public class DBUtil {
 
+    /**
+     * Method for generating a connection URL for the database.
+     * @param propertiesPath Path of the properties file
+     * @param sce Servlet context
+     * @return A database connection url
+     */
     public static String getConnectionUrl(String propertiesPath, ServletContextEvent sce) {
         Properties properties = new Properties();
 
@@ -29,6 +38,10 @@ public class DBUtil {
         }
     }
 
+    /**
+     * Method for populating database with some data.
+     * @param cpds Data source
+     */
     public static void initializeData(ComboPooledDataSource cpds) {
 
         try (Connection con = cpds.getConnection()) {
@@ -142,6 +155,13 @@ public class DBUtil {
 
     }
 
+    /**
+     * Method for checking if the specified table is present in the database.
+     * @param con Connection
+     * @param tableName Name of the table to check
+     * @return True if the specified table exists in the connected database
+     * @throws SQLException SQL exception
+     */
     public static boolean isTablePresent(Connection con, String tableName) throws SQLException {
         DatabaseMetaData metaData = con.getMetaData();
 

@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * Servlet filter for providing an SQL connection for servlets.
+ */
 @WebFilter(filterName="f1",urlPatterns={"/servleti/*"})
 public class ConnectionSetterFilter implements Filter {
 
@@ -20,6 +23,14 @@ public class ConnectionSetterFilter implements Filter {
     public void destroy() {
     }
 
+    /**
+     * Method for connection creation and providing.
+     * @param request Servlet HTTP request
+     * @param response Servlet HTTP response
+     * @param chain Filter chain
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {

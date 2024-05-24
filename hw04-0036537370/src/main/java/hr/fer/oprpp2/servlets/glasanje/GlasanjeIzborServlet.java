@@ -14,9 +14,19 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Servlet for showing one poll results.
+ */
 @WebServlet(name = "Glasanje", urlPatterns = "/servleti/glasanje")
 public class GlasanjeIzborServlet extends HttpServlet {
 
+    /**
+     * Method for showing a poll results.
+     * @param req HTTP Request
+     * @param resp HTTP Response
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {

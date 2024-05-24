@@ -5,8 +5,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Network utility class.
+ */
 public class NetworkUtil {
 
+    /**
+     * Method for gently throwing a network exception.
+     * @param req Servlet HTTP request
+     * @param resp Servlet HTTP response
+     * @param message Error message
+     * @param e Exception
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     public static void throwNetworkError(HttpServletRequest req, HttpServletResponse resp, String message, Exception e)
             throws ServletException, IOException {
         e.printStackTrace();

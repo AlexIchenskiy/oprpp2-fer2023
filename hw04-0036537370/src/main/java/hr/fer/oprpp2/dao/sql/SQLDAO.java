@@ -23,6 +23,10 @@ import java.util.List;
  */
 public class SQLDAO implements DAO {
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void vote(long pollOptionId) {
         Connection con = SQLConnectionProvider.getConnection();
 
@@ -35,14 +39,28 @@ public class SQLDAO implements DAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<PollOption> getPollOptions(long pollId) {
         return this.getPollOptionsInner(pollId, "");
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<PollOption> getPollOptions(long pollId, String orderBy) {
         return this.getPollOptionsInner(pollId, "ORDER BY " + orderBy);
     }
 
+    /**
+     * Method for retrieving poll options for the poll ordered by some value.
+     * @param pollId Poll to fetch its poll options
+     * @param orderBy Value to be ordered by
+     * @return List of poll options for the specified poll ordered by a provided value
+     */
     private List<PollOption> getPollOptionsInner(long pollId, String orderBy) {
         Connection con = SQLConnectionProvider.getConnection();
 
@@ -70,6 +88,10 @@ public class SQLDAO implements DAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<Poll> getPolls() {
         Connection con = SQLConnectionProvider.getConnection();
 
@@ -88,6 +110,9 @@ public class SQLDAO implements DAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getWinnerVideos(long pollId) {
         Connection con = SQLConnectionProvider.getConnection();
@@ -123,6 +148,10 @@ public class SQLDAO implements DAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Poll getPollById(long pollId) {
         Connection con = SQLConnectionProvider.getConnection();
 
