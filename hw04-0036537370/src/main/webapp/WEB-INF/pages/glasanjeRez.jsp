@@ -39,7 +39,7 @@
                                                         </c:url>">ovdje</a></p>
 
         <h2>Razno</h2>
-        <p>Primjeri pjesama pobjedničkih bendova:</p>
+        <p>Pobjednici:</p>
         <ul>
             <c:if test="${ videos.size() > 0 }">
                 <c:forEach var="i" begin="0" end="${ videos.size() - 1 }" step="1">

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,13 +34,14 @@ public class GlasanjeXlsServlet extends HttpServlet {
         try (HSSFWorkbook workbook = new HSSFWorkbook()) {
             List<PollOption> data = DAOProvider.getDao().getPollOptions(Long.parseLong(req.getParameter("pollID")),
                     "votesCount");
+            Collections.reverse(data);
             HSSFSheet sheet = workbook.createSheet("Results");
 
             HSSFRow rowHead = sheet.createRow((short) 0);
             rowHead.createCell((short) 0).setCellValue("Score");
-            rowHead.createCell((short) 1).setCellValue("Band");
+            rowHead.createCell((short) 1).setCellValue("Name");
             rowHead.createCell((short) 2).setCellValue("ID");
-            rowHead.createCell((short) 3).setCellValue("Video");
+            rowHead.createCell((short) 3).setCellValue("Link");
 
             for (int i = 0; i < data.size(); i++) {
                 HSSFRow row = sheet.createRow((short) (i + 1));

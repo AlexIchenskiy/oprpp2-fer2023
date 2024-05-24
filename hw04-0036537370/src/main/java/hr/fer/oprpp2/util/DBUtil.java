@@ -124,15 +124,15 @@ public class DBUtil {
                                 "https://www.youtube.com/watch?v=N-aK6JnyFmk", 1, 0),
 
                         new PollOption(8, "Java 8",
-                                "https://www.oracle.com/java/technologies/javase/javase8-archive-downloads.html", 1, 0),
+                                "https://www.oracle.com/java/technologies/javase/javase8-archive-downloads.html", 2, 0),
                         new PollOption(9, "Java 9",
-                                "https://www.oracle.com/java/technologies/javase/javase9-archive-downloads.html", 1, 0),
+                                "https://www.oracle.com/java/technologies/javase/javase9-archive-downloads.html", 2, 0),
                         new PollOption(10, "Java 11",
-                                "https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html", 1, 0),
+                                "https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html", 2, 0),
                         new PollOption(12, "Java 17",
-                                "https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html", 1, 0),
+                                "https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html", 2, 0),
                         new PollOption(12, "Java 21",
-                                "https://www.oracle.com/java/technologies/downloads/#java21", 1, 0)
+                                "https://www.oracle.com/java/technologies/downloads/#java21", 2, 0)
                 );
 
                 for (PollOption option : options) {
