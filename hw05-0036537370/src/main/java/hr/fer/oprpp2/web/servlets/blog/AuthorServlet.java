@@ -98,6 +98,13 @@ public class AuthorServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
+
+        if (session.getAttribute("current.user.id") == null) {
+            NetworkUtil.throwNetworkError(req, resp, "Unauthenticated.");
+            return;
+        }
+
         String title = req.getParameter("title");
         String text = req.getParameter("text");
 

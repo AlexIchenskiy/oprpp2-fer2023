@@ -75,7 +75,7 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        resp.sendRedirect("/servleti/main");
+        resp.sendRedirect("/blog/servleti/main");
     }
 
     protected void doError(HttpServletRequest req, HttpServletResponse resp, String message) throws IOException, ServletException {

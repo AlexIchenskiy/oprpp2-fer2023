@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Index servlet for redirecting users to the starting page.
  */
-@WebServlet(name = "IndexServlet", urlPatterns = "/index.jsp")
+@WebServlet(name = "IndexServlet", urlPatterns = { "/", "/index.html", "/index.jsp" })
 public class IndexServlet extends HttpServlet {
 
     /**

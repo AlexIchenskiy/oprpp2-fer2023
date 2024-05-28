@@ -28,21 +28,10 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public boolean createUser(BlogUser user) {
-        EntityManager em = JPAEMProvider.getEntityManager();
-        EntityTransaction et = null;
-
         try {
-            et = em.getTransaction();
-            et.begin();
-            em.persist(user);
-            et.commit();
-
+            JPAEMProvider.getEntityManager().persist(user);
             return true;
         } catch (Exception e) {
-            if (et != null && et.isActive()) {
-                et.rollback();
-            }
-
             return false;
         }
     }
