@@ -10,13 +10,22 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 
+/**
+ * Web JPA filter.
+ */
 @WebFilter(filterName = "f1", urlPatterns = { "/servleti/*" })
 public class JPAFilter implements Filter {
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
@@ -27,6 +36,9 @@ public class JPAFilter implements Filter {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void destroy() {
 	}

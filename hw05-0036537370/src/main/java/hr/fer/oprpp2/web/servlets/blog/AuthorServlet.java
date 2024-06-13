@@ -14,13 +14,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Author servlet for handling the main blog entries logic.
+ */
 @WebServlet(name = "author", urlPatterns = { "/servleti/author/*" })
 public class AuthorServlet extends HttpServlet {
 
+    /**
+     * Method that handles the blog posts data logic.
+     * @param req HTTP Request
+     * @param resp HTTP Response
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
@@ -96,6 +105,13 @@ public class AuthorServlet extends HttpServlet {
         NetworkUtil.throwNetworkError(req, resp, "Invalid arguments.");
     }
 
+    /**
+     * Method for creating or editing an entry.
+     * @param req HTTP Request
+     * @param resp HTTP Response
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
@@ -179,6 +195,13 @@ public class AuthorServlet extends HttpServlet {
         NetworkUtil.throwNetworkError(req, resp, "Invalid arguments.");
     }
 
+    /**
+     * Method that redirects users to the error page.
+     * @param req HTTP Request
+     * @param resp HTTP Response
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     protected void doError(HttpServletRequest req, HttpServletResponse resp, String message,
                            String option, String author)
             throws IOException, ServletException {

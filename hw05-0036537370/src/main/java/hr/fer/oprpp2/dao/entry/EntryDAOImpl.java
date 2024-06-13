@@ -5,13 +5,17 @@ import hr.fer.oprpp2.model.BlogComment;
 import hr.fer.oprpp2.model.BlogEntry;
 import hr.fer.oprpp2.model.BlogUser;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Implementation of the entry DAO.
+ */
 public class EntryDAOImpl implements EntryDAO {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<BlogEntry> getEntriesByUser(BlogUser user) {
         return JPAEMProvider.getEntityManager()
@@ -20,11 +24,17 @@ public class EntryDAOImpl implements EntryDAO {
                 .getResultList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BlogEntry getEntryById(Long id) {
         return JPAEMProvider.getEntityManager().find(BlogEntry.class, id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean createEntry(BlogEntry entry) {
         try {
@@ -35,6 +45,9 @@ public class EntryDAOImpl implements EntryDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean editEntry(BlogEntry entry) {
         try {
@@ -47,6 +60,9 @@ public class EntryDAOImpl implements EntryDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean addComment(BlogComment comment) {
         try {

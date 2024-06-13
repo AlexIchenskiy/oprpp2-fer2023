@@ -1,16 +1,19 @@
 package hr.fer.oprpp2.dao.user;
 
-import hr.fer.oprpp2.dao.jpa.JPAEMFProvider;
 import hr.fer.oprpp2.dao.jpa.JPAEMProvider;
 import hr.fer.oprpp2.model.BlogUser;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import java.util.List;
 
+/**
+ * Implementation of the user DAO.
+ */
 public class UserDAOImpl implements UserDAO {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BlogUser getUserByNickname(String nickname) {
         try {
@@ -26,6 +29,9 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean createUser(BlogUser user) {
         try {
@@ -36,6 +42,9 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<BlogUser> getUserList() {
         return JPAEMProvider.getEntityManager()

@@ -3,6 +3,9 @@ package hr.fer.oprpp2.model;
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Blog user model class.
+ */
 @Entity
 @Table(name="blog_users")
 public class BlogUser {
@@ -94,4 +97,5 @@ public class BlogUser {
     public void setBlogEntries(List<BlogEntry> blogEntries) {
         this.blogEntries = blogEntries;
     }
+
 }

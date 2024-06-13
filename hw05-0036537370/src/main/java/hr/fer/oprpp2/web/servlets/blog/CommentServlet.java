@@ -14,9 +14,19 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 
+/**
+ * Comment servlet for handling the comments' logic.
+ */
 @WebServlet(name = "comments", urlPatterns = { "/servleti/comments" })
 public class CommentServlet extends HttpServlet {
 
+    /**
+     * Method that handles adding a comment.
+     * @param req HTTP Request
+     * @param resp HTTP Response
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {

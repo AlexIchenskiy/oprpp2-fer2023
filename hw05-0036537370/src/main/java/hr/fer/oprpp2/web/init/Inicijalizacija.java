@@ -8,9 +8,15 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+/**
+ * The initialization class for the web server.
+ */
 @WebListener
 public class Inicijalizacija implements ServletContextListener {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("baza.podataka.za.blog");
@@ -18,6 +24,9 @@ public class Inicijalizacija implements ServletContextListener {
         JPAEMFProvider.setEmf(emf);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         JPAEMFProvider.setEmf(null);

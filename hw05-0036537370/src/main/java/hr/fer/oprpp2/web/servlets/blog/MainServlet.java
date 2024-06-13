@@ -14,9 +14,19 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Main servlet for handling the main page logic.
+ */
 @WebServlet(name = "main", urlPatterns = { "/servleti/main" })
 public class MainServlet extends HttpServlet {
 
+    /**
+     * Method that redirects users to the main page with a list of authors.
+     * @param req HTTP Request
+     * @param resp HTTP Response
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
@@ -34,6 +44,13 @@ public class MainServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/pages/index.jsp").forward(req, resp);
     }
 
+    /**
+     * Method that handles the user login process.
+     * @param req HTTP Request
+     * @param resp HTTP Response
+     * @throws ServletException Request processing exception
+     * @throws IOException File manipulation exception
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String nickname = req.getParameter("nick");

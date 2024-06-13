@@ -6,6 +6,9 @@ import java.util.List;
 
 import javax.persistence.*;
 
+/**
+ * Blog entry model class.
+ */
 @NamedQueries({
         @NamedQuery(name="BlogEntry.upit1",query="select b from BlogComment as b where b.blogEntry=:be and b.postedOn>:when")
 })

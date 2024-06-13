@@ -4,10 +4,20 @@ import hr.fer.oprpp2.dao.DAOException;
 
 import javax.persistence.EntityManager;
 
+/**
+ * Provider class for JPA entity manager.
+ */
 public class JPAEMProvider {
 
+	/**
+	 * Available entity managers.
+	 */
 	private static ThreadLocal<EntityManager> locals = new ThreadLocal<>();
 
+	/**
+	 * Method for retrieving or creating a single entity manager.
+	 * @return Entity manager
+	 */
 	public static EntityManager getEntityManager() {
 		EntityManager em = locals.get();
 		if(em == null) {
@@ -18,6 +28,10 @@ public class JPAEMProvider {
 		return em;
 	}
 
+	/**
+	 * Closing method.
+	 * @throws DAOException DAO exception
+	 */
 	public static void close() throws DAOException {
 		EntityManager em = locals.get();
 		if(em == null) {
